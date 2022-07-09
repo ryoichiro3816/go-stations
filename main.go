@@ -2,10 +2,12 @@ package main
 
 import (
 	"log"
+	"net/http"
 	"os"
 	"time"
 
 	"github.com/TechBowl-japan/go-stations/db"
+	"github.com/TechBowl-japan/go-stations/handler"
 	"github.com/TechBowl-japan/go-stations/handler/router"
 )
 
@@ -48,9 +50,13 @@ func realMain() error {
 	defer todoDB.Close()
 
 	// set http handlers
-	mux := router.NewRouter(todoDB)
 
-	// TODO: ここから実装を行う
+	// TODO: ここから実装を行
+
+	mux := router.NewRouter(todoDB)
+	x := handler.NewHealthzHandler()
+	mux.Handle("/healthz", x)
+	log.Fatal(http.ListenAndServe(":8080", mux))
 
 	return nil
 }

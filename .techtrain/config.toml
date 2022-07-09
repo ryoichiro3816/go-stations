@@ -1,1 +1,2 @@
-auth = { }
+[auth]
+apiToken = "64afacd4b5b6a9c7b9539a2ad443bf3f866b6d05ba8f0535f3a907554fc690db0e34beb4bb8f29f2"
