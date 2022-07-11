@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 	"database/sql"
-	"log"
 
 	"github.com/TechBowl-japan/go-stations/model"
 )
@@ -27,6 +26,7 @@ func (s *TODOService) CreateTODO(ctx context.Context, subject, description strin
 		confirm = `SELECT subject, description, created_at, updated_at FROM todos WHERE id = ?`
 	)
 	var todo model.TODO
+
 	insert_row, err := s.db.ExecContext(ctx, insert, subject, description)
 	if err != nil {
 		return nil, err
@@ -37,9 +37,21 @@ func (s *TODOService) CreateTODO(ctx context.Context, subject, description strin
 	}
 
 	err_ := s.db.QueryRowContext(ctx, confirm, insert_row_id).Scan(&todo.Subject, &todo.Description, &todo.CreatedAt, &todo.UpdatedAt)
-	if err_ != nil {
-		log.Print(err_)
+	if err != nil {
+		return nil, err_
 	}
+	// switch {
+	// case row == sql.ErrNoRows:
+	// 	log.Printf("no user with id %d\n", insert_row_id)
+	// case err != nil:
+	// 	log.Fatalf("query error: %v\n", row)
+	// default:
+	// 	result := &model.TODO{
+	// 		Subject:     subject,
+	// 		Description: description,
+	// 		CreatedAt:   createdat,
+	// 		UpdatedAt:   updatedat,
+	// 	}
 	return &todo, err_
 }
 
