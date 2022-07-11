@@ -25,8 +25,34 @@ func (s *TODOService) CreateTODO(ctx context.Context, subject, description strin
 		insert  = `INSERT INTO todos(subject, description) VALUES(?, ?)`
 		confirm = `SELECT subject, description, created_at, updated_at FROM todos WHERE id = ?`
 	)
+	var todo model.TODO
 
-	return nil, nil
+	insert_row, err := s.db.ExecContext(ctx, insert, subject, description)
+	if err != nil {
+		return nil, err
+	}
+	insert_row_id, err := insert_row.LastInsertId()
+	if err != nil {
+		return nil, err
+	}
+
+	err_ := s.db.QueryRowContext(ctx, confirm, insert_row_id).Scan(&todo.Subject, &todo.Description, &todo.CreatedAt, &todo.UpdatedAt)
+	if err != nil {
+		return nil, err_
+	}
+	// switch {
+	// case row == sql.ErrNoRows:
+	// 	log.Printf("no user with id %d\n", insert_row_id)
+	// case err != nil:
+	// 	log.Fatalf("query error: %v\n", row)
+	// default:
+	// 	result := &model.TODO{
+	// 		Subject:     subject,
+	// 		Description: description,
+	// 		CreatedAt:   createdat,
+	// 		UpdatedAt:   updatedat,
+	// 	}
+	return &todo, err_
 }
 
 // ReadTODO reads TODOs on DB.
